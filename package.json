@@ -1,0 +1,16 @@
+{
+  "name": "backend_proj",
+  "version": "1.0.0",
+  "description": "a backend project",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "author": "Prateek Patidar",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.2"
+  }
+}

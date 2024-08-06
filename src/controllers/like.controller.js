@@ -1,5 +1,7 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Likes } from "../models/likes.models.js";
+import { Comment } from "../models/comment.models.js";
+import { Tweet } from "../models/tweet.models.js";
 import { Video } from "../models/video.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -23,7 +25,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     await Likes.findByIdAndDelete(existingLike?._id);
     return res
       .status(200)
-      .json(new ApiResponse(200), {}, "Video unliked successfully");
+      .json(new ApiResponse(200, {}, "Video unliked successfully"));
   } else {
     const newLike = await Likes.create({
       video: videoId,
@@ -31,7 +33,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     });
     return res
       .status(200)
-      .json(new ApiResponse(200), newLike, "Video liked successfully");
+      .json(new ApiResponse(200, newLike, "Video liked successfully"));
   }
 });
 
@@ -44,7 +46,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid comment id");
   if (!isValidObjectId(userId)) throw new ApiError(400, "Invalid user id");
 
-  const comment = await Video.findById(commentId);
+  const comment = await Comment.findById(commentId);
   if (!comment) {
     throw new ApiError(400, "Comment not found");
   }
@@ -57,7 +59,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     await Likes.findByIdAndDelete(existingLike?._id);
     return res
       .status(200)
-      .json(new ApiResponse(200), {}, "Comment unliked successfully");
+      .json(new ApiResponse(200, {}, "Comment unliked successfully"));
   } else {
     const newLike = await Likes.create({
       comment: commentId,
@@ -65,7 +67,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     });
     return res
       .status(200)
-      .json(new ApiResponse(200), newLike, "Comment liked successfully");
+      .json(new ApiResponse(200, newLike, "Comment liked successfully"));
   }
 });
 
@@ -77,7 +79,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
   if (!isValidObjectId(tweetId)) throw new ApiError(400, "Invalid tweet id");
   if (!isValidObjectId(userId)) throw new ApiError(400, "Invalid user id");
 
-  const tweet = await Video.findById(tweetId);
+  const tweet = await Tweet.findById(tweetId);
   if (!tweet) {
     throw new ApiError(400, "Tweet not found");
   }
@@ -95,7 +97,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     });
     return res
       .status(200)
-      .json(new ApiResponse(200), newLike, "Tweet liked successfully");
+      .json(new ApiResponse(200, newLike, "Tweet liked successfully"));
   }
 });
 
@@ -114,17 +116,17 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     select: "title description url",
   });
 
-  if (!allLikedVideos) {
+  if (allLikedVideos.length===0) {
     throw new ApiError(400, "No liked videos found");
   }
 
   return res
     .status(200)
     .json(
-      new ApiResponse(200),
+      new ApiResponse(200,
       allLikedVideos,
       "Liked videos retrieved successfully"
-    );
+    ));
 });
 
 export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };

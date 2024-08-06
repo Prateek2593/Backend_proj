@@ -52,10 +52,12 @@ const userSchema = new Schema(
 //it take an event (say, save) and a call back function
 //dont use arrow function, as it doesnot have 'this' reference
 userSchema.pre("save", async function(next){
+    console.log(this.password);
     //is password not modified, then go to next()
     if(!this.isModified("password")) return next();
     //encryption of password
     this.password = await bcrypt.hash(this.password, 10);
+    console.log(this.password);
     next()
 })
 

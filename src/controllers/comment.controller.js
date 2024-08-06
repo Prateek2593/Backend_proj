@@ -1,10 +1,9 @@
 import mongoose, { isValidObjectId } from "mongoose";
-import { Comment } from "../models/comment.model.js";
+import { Comment } from "../models/comment.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Video } from "../models/video.models.js";
-import { populate } from "dotenv";
 
 const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
@@ -30,7 +29,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const options = {
     page: pageNumber,
     limit: limitNumber,
-    populate: owner,
+    populate: "owner",
     sort: { createdAt: -1 },
   };
 
@@ -52,7 +51,7 @@ const addComment = asyncHandler(async (req, res) => {
   }
   const comment = await Comment.create({
     content,
-    videoId,
+    video:videoId,
     owner: req.user?._id,
   });
   if (!comment) {
@@ -66,11 +65,11 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
   // TODO: update a comment
-  const { id } = req.params;
+  const { commentid } = req.params;
   const { content } = req.body;
 
-  const commentId = await Comment.findById(id);
-  if (!commentId) {
+  const comment = await Comment.findById(commentid);
+  if (!comment) {
     throw new ApiError(400, "Invalid Comment");
   }
 
@@ -79,7 +78,7 @@ const updateComment = asyncHandler(async (req, res) => {
   }
 
   const newComment = await Comment.findByIdAndUpdate(
-    commentId,
+    commentid,
     {
       $set: {
         content,
@@ -100,14 +99,14 @@ const updateComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
   // TODO: delete a comment
-  const { id } = req.params;
+  const { commentid } = req.params;
 
-  const commentId = await Comment.findById(id);
-  if (!commentId) {
+  const comment = await Comment.findById(commentid);
+  if (!comment) {
     throw new ApiError(400, "Comment not found");
   }
 
-  const commentToBeDeleted = await Comment.findByIdAndDelete(commentId);
+  const commentToBeDeleted = await Comment.findByIdAndDelete(commentid);
   if (!commentToBeDeleted) {
     throw new ApiError(400, "Error while deleting the comment");
   }
